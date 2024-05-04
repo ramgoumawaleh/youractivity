@@ -1,0 +1,185 @@
+
+
+.nav_form{
+    -fx-background-color: linear-gradient(to top right, #1e242e, #008040);
+}
+.nav_btn{
+    -fx-background-color:transparent;
+    -fx-text-fill: #fff;
+    -fx-font-size: 15px;
+    -fx-cursor: hand;
+}
+.button:hover {
+    -fx-background-color: linear-gradient(to top right, #1e242e, #ba1b1b);
+}
+.bg_white{
+    -fx-background-color: #fff;
+    -fx-effect: dropshadow(three-pass-box,rgba(0,0,0,.3),8,0,0,0);
+    -fx-background-radius: 8px;
+}
+.card1 {
+    -fx-background-color:  linear-gradient(to right, #1e242e, #224c7c);
+    -fx-background-radius: 0px 10px 10px 0px;
+}
+.card1_left{
+    -fx-background-color:  linear-gradient(to right, #1e242e, #22647c);
+
+}
+.card2 {
+    -fx-background-color:  linear-gradient(to right, #1e242e, #7c2252);
+    -fx-background-radius: 0px 10px 10px 0px;
+}
+.card2_left{
+    -fx-background-color:  linear-gradient(to right, #1e242e, #7c226d);
+
+}
+.card3 {
+    -fx-background-color:  linear-gradient(to right, #1e242e, #56e8cd);
+    -fx-background-radius: 0px 10px 10px 0px;
+}
+.card3_left{
+    -fx-background-color:  linear-gradient(to right, #1e242e, #56e8e8);
+
+}
+.card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 5,0,0,0);
+}
+.label-style {
+    -fx-font-family: Arial;
+    -fx-font-size: 16px;
+    -fx-text-fill: #ede8e8;
+    -fx-font-weight: bold;
+}
+.ad_textfield {
+    -fx-background-color: #fff;
+    -fx-background-radius: 0px 5px 5px 0px;
+    -fx-border-color: #1e242e;
+    -fx-border-width: .8px;
+    -fx-background-radius: 0px 5px 0px 0px;
+    -fx-font-size: 13px;
+}
+.ad_textfield:focused{
+    -fx-border-color: #ae2d3c;
+    -fx-border-width: 1.5px;
+}
+.insert_btn{
+    -fx-background-color: #d3bca5;
+    -fx-text-fill: #fff;
+    -fx-font-size: 15px;
+    -fx-cursor: hand;
+}
+.insert_btn:hover{
+    -fx-background-color: linear-gradient(to top right, #1e242e, #d56f6f);
+}
+.ajt_btn{
+    -fx-background-color: #dd7618;
+    -fx-text-fill: #fff;
+    -fx-font-size: 15px;
+    -fx-cursor: hand;
+}
+.ajt_btn:hover{
+    -fx-background-color: linear-gradient(to top right, #1e242e, #804c18);
+}
+.mod_btn{
+    -fx-background-color: #770d0d;
+    -fx-text-fill: #fff;
+    -fx-font-size: 15px;
+    -fx-cursor: hand;
+}
+.mod_btn:hover{
+    -fx-background-color: linear-gradient(to top right, #1e242e, #ba1b1b);
+}
+.supp_btn{
+    -fx-background-color: #0cb610;
+    -fx-text-fill: #fff;
+    -fx-font-size: 15px;
+    -fx-cursor: hand;
+}
+.supp_btn:hover{
+    -fx-background-color: linear-gradient(to top right, #1e242e, #336010);
+}
+.vider_btn{
+    -fx-background-color: #22647c;
+    -fx-text-fill: #fff;
+    -fx-font-size: 15px;
+    -fx-cursor: hand;
+}
+.vider_btn:hover{
+    -fx-background-color: linear-gradient(to top right, #1e242e, #0a294a);
+}
+.chercher {
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 0px 10px 0px 0px;
+    -fx-border-color: #1E242E;
+    -fx-border-width: 1px;
+    -fx-font-size: 14px;
+    -fx-border-radius: 0px 0px 0px 20px;
+    -fx-padding: 0px 0px 0px 20px;
+}
+
+.chercher:focused {
+    -fx-border-color: #ae2d3c;
+    -fx-border-width: 2px;
+}
+.table-view{
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 10px;
+    -fx-border-color: #AE2D3C;
+    -fx-border-radius: 0px 0px 0px 20px;
+    -fx-fill: #fff;
+}
+.table-view .column-header,background{
+    -fx-background-color: linear-gradient(to top right, #1e242e, #0a294a);
+    -fx-background-insets: 0 0 0 0;
+    -fx-background-radius:10px 0px 0px 0px;
+}
+.table-view .column-header,table-view .filter{
+    -fx-background-color: transparent;
+    -fx-font-size: 10px;
+    -fx-fill: #fff;
+
+}
+.info_card {
+    -fx-border-color: #ae2d3c ;
+    -fx-border-radius:10px 0px 0px 0px ;
+}
+.slabel_info{
+    -fx-border-color: #ae2d3c;
+    -fx-border-radius: 0px 5px 0px 0px ;
+    -fx-border-width:.8px;
+    -fx-padding: 5px;
+    -fx-font-size: 14px;
+}
+.spinner{
+    -fx-background-color: #FFF;
+    -fx-border-color: #000;
+    -fx-border-width:.8px;
+}
+.payé_btn{
+    -fx-background-color: #0ca2b6;
+    -fx-text-fill: #fff;
+    -fx-font-size: 8px;
+    -fx-cursor: hand;
+}
+.payé_btn:hover{
+    -fx-background-color:  #1e242e;
+}
+.reçu_btn{
+    -fx-background-color: #ffeb00;
+    -fx-text-fill: #fff;
+    -fx-font-size: 8px;
+    -fx-cursor: hand;
+}
+.reçu_btn:hover{
+    -fx-background-color: #e8c735;
+}
+.card_customer{
+    -fx-background-color: #FFFFFF;
+    -fx-background-radius: 10px;
+    -fx-border-color: #AE2D3C;
+    -fx-border-width: .8px;
+    -fx-border-radius: 5px;
+}
+
+.container {
+}

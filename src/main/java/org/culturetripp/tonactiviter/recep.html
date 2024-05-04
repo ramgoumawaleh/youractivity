@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Form</title>
+    <style>
+        /* Ajoutez vos styles CSS ici */
+        /* Style pour le formulaire */
+        form {
+            width: 400px;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        /* Style pour les éléments du formulaire */
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<form id="payment-form" action="#" method="post">
+    <label for="quantity1">Quantity for Product 1:</label>
+    <input type="number" id="quantity1" name="quantity1" min="0" max="100" value="0">
+    <label for="quantity2">Quantity for Product 2:</label>
+    <input type="number" id="quantity2" name="quantity2" min="0" max="100" value="0">
+    <label for="total">Total (in DT):</label>
+    <input type="text" id="total" name="total" readonly>
+    <button type="button" onclick="calculateTotal()">Calculate Total</button>
+    <button type="submit">Submit Payment</button>
+</form>
+
+<script>
+    function calculateTotal() {
+        var quantity1 = parseInt(document.getElementById('quantity1').value);
+        var quantity2 = parseInt(document.getElementById('quantity2').value);
+        var price1 = 40; // Prix du produit 1 en DT
+        var price2 = 30; // Prix du produit 2 en DT
+        var total = (quantity1 * price1) + (quantity2 * price2);
+        document.getElementById('total').value = total.toFixed(2) + ' DT';
+    }
+</script>
+</body>
+</html>
+
