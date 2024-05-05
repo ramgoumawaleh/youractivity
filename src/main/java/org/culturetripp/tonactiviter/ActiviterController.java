@@ -497,6 +497,8 @@ public class ActiviterController implements Initializable {
     private int qty2 = 0;
 
 
+
+
     public void payer(){
 
         String sql = "INSERT INTO client (type,total,date) VALUES(???)";
@@ -733,46 +735,31 @@ public class ActiviterController implements Initializable {
         if(event.getSource() == dashboard_btn){
             dashboard_form.setVisible(true);
             add_form.setVisible(false);
-            client_form.setVisible(false);
             dispo_form.setVisible(false);
 
             dashboard_btn.setStyle("-fx-background-color: #ae2d3c");
             add_btn.setStyle("-fx-background-color: transparent");
-            client_btn.setStyle("-fx-background-color: transparent");
             dispo_btn.setStyle("-fx-background-color: transparent");
 
         }else if(event.getSource() == add_btn){
             dashboard_form.setVisible(false);
             add_form.setVisible(true);
-            client_form.setVisible(false);
             dispo_form.setVisible(false);
 
             dashboard_btn.setStyle("-fx-background-color: transparent");
             add_btn.setStyle("-fx-background-color: #ae2d3c");
-            client_btn.setStyle("-fx-background-color: transparent");
             dispo_btn.setStyle("-fx-background-color: transparent");
 
-        }else if(event.getSource() == client_btn){
-            dashboard_form.setVisible(false);
-            add_form.setVisible(false);
-            client_form.setVisible(true);
-            dispo_form.setVisible(false);
 
-            dashboard_btn.setStyle("-fx-background-color: transparent");
-            add_btn.setStyle("-fx-background-color: transparent");
-            client_btn.setStyle("-fx-background-color: #ae2d3c");
-            dispo_btn.setStyle("-fx-background-color: transparent");
 
 
         }else if(event.getSource() == dispo_btn){
             dashboard_form.setVisible(false);
             add_form.setVisible(false);
-            client_form.setVisible(false);
             dispo_form.setVisible(true);
 
             dashboard_btn.setStyle("-fx-background-color: transparent");
             add_btn.setStyle("-fx-background-color: transparent");
-            client_btn.setStyle("-fx-background-color: transparent");
             dispo_btn.setStyle("-fx-background-color: #ae2d3c");
 
             showDispoActiviterList();
