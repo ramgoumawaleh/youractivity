@@ -268,7 +268,7 @@
                               </font>
                            </Label>
                            <Button fx:id="dispo_viderbtn" layoutX="282.0" layoutY="314.0" mnemonicParsing="false" onAction="#clearbuyticketinfo" styleClass="vider_btn" stylesheets="@Dashboard.css" text="Vider" />
-                           <Button fx:id="dispo_reçubtn" layoutX="506.0" layoutY="314.0" mnemonicParsing="false" styleClass="mod_btn" stylesheets="@Dashboard.css" text="Reçu" />
+                           <Button fx:id="dispo_reçubtn" layoutX="506.0" layoutY="314.0" mnemonicParsing="false" onAction="#generatePDF" styleClass="mod_btn" stylesheets="@Dashboard.css" text="Reçu" />
                            <Button fx:id="dispo_payébtn" layoutX="587.0" layoutY="314.0" mnemonicParsing="false" onAction="#payer" styleClass="insert_btn" stylesheets="@Dashboard.css" text="Payé" />
                         </children>
                      </AnchorPane>

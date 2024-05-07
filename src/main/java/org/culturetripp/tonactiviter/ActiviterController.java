@@ -1,7 +1,14 @@
 package org.culturetripp.tonactiviter;
 
+import com.itextpdf.kernel.pdf.PdfDocument;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.property.TextAlignment;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -11,26 +18,30 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import java.sql.Statement;
+import com.itextpdf.layout.Document;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.*;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 
 import javafx.event.ActionEvent;
 
 import javax.swing.*;
 import java.io.File;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.ResourceBundle;
 import java.util.Optional;
 
+import static org.culturetripp.tonactiviter.getData.date;
 import static org.culturetripp.tonactiviter.getData.title;
 
 public class ActiviterController implements Initializable {
@@ -291,6 +302,9 @@ public class ActiviterController implements Initializable {
 
 
     public void selectAjoutActiviter(){
+
+
+
         AjoutData ajtD = addact_tableview.getSelectionModel().getSelectedItem();
         int num = addact_tableview.getSelectionModel().getSelectedIndex();
         if((num -1) < -1){
@@ -313,8 +327,24 @@ public class ActiviterController implements Initializable {
     }
 
 
-
     public void insertAjoutActiviter() {
+
+        String uri = getData.path;
+
+        // Vérifier si le chemin d'accès est null ou vide
+        if (uri == null || uri.isEmpty()) {
+            // Afficher un message d'erreur et sortir de la méthode
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Erreur");
+            alert.setHeaderText(null);
+            alert.setContentText("Veuillez remplir tous les champs et importer une image");
+            alert.showAndWait();
+            return;
+        }
+
+        // Remplacer les caractères "\\" dans le chemin d'accès
+        uri = uri.replace("\\", "\\\\");
+
         String sql1 = "SELECT * FROM ajoutactiviter WHERE nom= '"
                 +add_name.getText()+"'";
 
@@ -326,19 +356,18 @@ public class ActiviterController implements Initializable {
             statement = connect.createStatement();
             result = statement.executeQuery(sql1);
 
-
             if (result.next()) {
                 alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Erreur");
                 alert.setHeaderText(null);
-                alert.setContentText(add_name.getText() + " was already added");
+                alert.setContentText(add_name.getText() + " a déjà été ajouté");
                 alert.showAndWait();
             } else {
-                if (add_name.getText().isEmpty() || add_nameact.getText().isEmpty() || add_fname.getText().isEmpty() || image == null || add_date.getValue() == null) {
+                if (add_name.getText().isEmpty() || add_nameact.getText().isEmpty() || add_fname.getText().isEmpty() || add_date.getValue() == null) {
                     alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Erreur");
                     alert.setHeaderText(null);
-                    alert.setContentText("Please fill all blank fields and import an image");
+                    alert.setContentText("Veuillez remplir tous les champs");
                     alert.showAndWait();
                 } else {
                     String sql = "INSERT INTO ajoutactiviter (nom, prenom, NomActiviter, image, date) VALUES (?, ?, ?, ?, ?)";
@@ -346,14 +375,14 @@ public class ActiviterController implements Initializable {
                     prepare.setString(1, add_name.getText());
                     prepare.setString(2, add_fname.getText());
                     prepare.setString(3, add_nameact.getText());
-                    prepare.setString(4, image.getUrl()); // Utilisation de l'URL de l'ima
+                    prepare.setString(4, uri);
                     prepare.setString(5, String.valueOf(add_date.getValue()));
                     prepare.execute();
 
                     alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Success");
+                    alert.setTitle("Succès");
                     alert.setHeaderText(null);
-                    alert.setContentText("Successfully added");
+                    alert.setContentText("Ajouté avec succès");
                     alert.showAndWait();
 
                     clearAjoutActiviterList();
@@ -472,8 +501,34 @@ public class ActiviterController implements Initializable {
 
     }
 
-    public  void rechercherAjoutActiviter(){
+    public void rechercherAjoutActiviter() {
+        FilteredList<AjoutData> filter = new FilteredList<>(listAjoutActiviter, e -> true);
 
+        addact_cherc.textProperty().addListener((observable, oldValue, newValue) -> {
+            filter.setPredicate(predicateActData -> {
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                String keychercher = newValue.toLowerCase();
+
+                if (predicateActData.getPrenom().toLowerCase().contains(keychercher)) {
+                    return true;
+                } else if (predicateActData.getNom().toLowerCase().contains(keychercher)) {
+                    return true;
+                } else if (predicateActData.getNomActiviter().toLowerCase().contains(keychercher)) {
+                    return true;
+                } else if (predicateActData.getDate().toString().contains(keychercher)) {
+                    return true;
+                }
+
+                return false;
+            });
+        });
+
+        SortedList<AjoutData> sortData = new SortedList<>(filter);
+        sortData.comparatorProperty().bind(addact_tableview.comparatorProperty());
+        addact_tableview.setItems(sortData);
     }
 
 
@@ -498,90 +553,161 @@ public class ActiviterController implements Initializable {
 
 
 
+    public void generatePDF() {
+        ObservableList<Transaction> transactionList = FXCollections.observableArrayList();
+        String sql = "SELECT * FROM client_info WHERE client_id = ?";
+        LocalDate date = LocalDate.now();
 
-    public void payer(){
+        try (Connection connect = database.connectDb();
+             PreparedStatement prepare = connect.prepareStatement(sql)) {
+            int customerID = 1;
+            prepare.setInt(1, customerID);
+            try (ResultSet resultSet = prepare.executeQuery()) {
+                while (resultSet.next()) {
+                    String productName = resultSet.getString("type");
+                    int quantity = resultSet.getInt("quantity");
+                    float price = resultSet.getFloat("price");
+                    Transaction transaction = new Transaction(productName, quantity, price);
+                    transactionList.add(transaction);
+                }
+            }
 
-        String sql = "INSERT INTO client (type,total,date) VALUES(???)";
-
-        connect = database.connectDb();
-        String type ="";
-
-        if(price1 > 0 && price2 ==0){
-
-            type = "Adulte";
-        }else if(price2 > 0 && price1 ==0){
-            type ="Enfant";
-
-        }else if(price2 >0 && price1 >0){
-            type = "Adulte & Enfant";
+            try (PdfWriter writer = new PdfWriter("receipt.pdf");
+                 PdfDocument pdf = new PdfDocument(writer);
+                 Document document = new Document(pdf)) {
+                addHeader(document);
+                addCustomerInfo(document, date, customerID);
+                addTransactionDetails(document, transactionList);
+                addTotalAmount(document, transactionList);
+                addThankYouMessage(document);
+            }
+        } catch (SQLException | IOException e) {
+            throw new RuntimeException("Error while generating PDF", e);
         }
 
+
+
+    }
+
+    private void addHeader(Document document) {
+        Paragraph header = new Paragraph("Receipt")
+                .setFontSize(24)
+                .setTextAlignment(TextAlignment.CENTER);
+        document.add(header);
+    }
+
+    private void addCustomerInfo(Document document, LocalDate date, int customerID) {
+        Paragraph customerInfo = new Paragraph("Date: " + date.toString() + "\nCustomer ID: " + customerID)
+                .setFontSize(12);
+        document.add(customerInfo);
+    }
+
+    private void addTransactionDetails(Document document, ObservableList<Transaction> transactionList) {
+        for (Transaction transaction : transactionList) {
+            Paragraph transactionDetails = new Paragraph("Product: " + transaction.getProductName() +
+                    ", Quantity: " + transaction.getQuantity() +
+                    ", Price: " + String.format("%.2f", transaction.getPrice()))
+                    .setFontSize(12);
+            document.add(transactionDetails);
+        }
+    }
+
+    private void addTotalAmount(Document document, ObservableList<Transaction> transactionList) {
+        float totalAmount = calculateTotalAmount(transactionList);
+        Paragraph totalAmountParagraph = new Paragraph("Total Amount: TND " + String.format("%.2f", totalAmount))
+                .setFontSize(12);
+        document.add(totalAmountParagraph);
+    }
+
+    private void addThankYouMessage(Document document) {
+        Paragraph thankYouParagraph = new Paragraph("Thank you for your purchase!")
+                .setFontSize(12);
+        document.add(thankYouParagraph);
+    }
+
+    private float calculateTotalAmount(ObservableList<Transaction> transactionList) {
+        float totalAmount = 0;
+        for (Transaction transaction : transactionList) {
+            totalAmount += transaction.getQuantity() * transaction.getPrice();
+        }
+        return totalAmount;
+    }
+
+
+
+
+
+
+    public void payer() {
+        String sql = "INSERT INTO client (type, total, date) VALUES (?, ?, ?)";
+        connect = database.connectDb();
+        String type = "";
+
+        if (price1 > 0 && price2 == 0) {
+            type = "Adulte";
+        } else if (price2 > 0 && price1 == 0) {
+            type = "Enfant";
+        } else if (price2 > 0 && price1 > 0) {
+            type = "Adulte & Enfant";
+        }
 
         Date date = new Date();
         java.sql.Date setDate = new java.sql.Date(date.getTime());
 
         try {
-
-            prepare = connect.prepareStatement(sql);
-            prepare.setString(1,type);
-            prepare.setString(2,String.valueOf(total));
-            prepare.setString(3,String.valueOf(setDate));
-
-            Alert alert;
-
-            if(dispo_imageview.getImage() == null || dispo_titre.getText().isEmpty())
-
-            {
-
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Eror Message");
-                alert.setHeaderText(null);
-                alert.setContentText("please select the activity first");
-                alert.showAndWait();
-
-            }  else if(price1 == 0 && price2 ==0){
-
-                alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Eror Message");
-                alert.setHeaderText("null");
-                alert.setContentText("please indicate the quantity of ticket you want to buy");
-                alert.showAndWait();
-
-
-            }else{
-                prepare.executeUpdate();
-
-                alert = new Alert ( Alert.AlertType.INFORMATION);
-                alert.setTitle("Information Message");
-                alert.setHeaderText(null);
-                alert.setContentText("successfuly buy");
-                alert.showAndWait();
-
-                String sql1= "SELECT * FROM client ";
-
-                prepare = connect.prepareStatement(sql1);
-                result = prepare.executeQuery();
-
-                int num = 0;
-
-                while (result.next()){
-
-                    num = result.getInt("id");
-
-                }
-                String sql2 = "INSER INTO client_info (client_id,type,totale,title) VALUES(?,?,?,?)";
-
-                prepare = connect.prepareStatement(sql2);
-                prepare.setString(1,String.valueOf(num));
-                prepare.setString(2,type);
-                prepare.setString(3,dispo_titre.getText());
-                prepare.setFloat(4,total);
-
-                prepare.executeUpdate();
-                clearbuyticketinfo();
+            // Appliquer la réduction de 20% si plus de 5 personnes achètent
+            float totalWithDiscount = total;
+            if (qty1 + qty2 > 5) {
+                totalWithDiscount *= 0.8;
             }
 
-        }catch (Exception e){e.printStackTrace();}
+            PreparedStatement prepare = connect.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+            prepare.setString(1, type);
+            prepare.setFloat(2, totalWithDiscount);
+            prepare.setDate(3, setDate);
+
+
+            // Vérifier si l'image et le titre sont sélectionnés
+            if (dispo_imageview.getImage() == null || dispo_titre.getText().isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error Message");
+                alert.setHeaderText(null);
+                alert.setContentText("Please select the activity and enter the title.");
+                alert.showAndWait();
+            } else {
+                // Exécuter la requête SQL pour insérer les détails d'achat
+                prepare.executeUpdate();
+
+                // Afficher un message d'alerte pour indiquer le succès de l'achat
+                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                successAlert.setTitle("Information Message");
+                successAlert.setHeaderText(null);
+                successAlert.setContentText("Successfully purchased!");
+                successAlert.showAndWait();
+
+                // Récupérer l'identifiant généré par la base de données
+                ResultSet generatedKeys = prepare.getGeneratedKeys();
+                int id = 0;
+                if (generatedKeys.next()) {
+                    id = generatedKeys.getInt(1);
+                }
+
+                // Insérer les détails de l'achat dans la table client_info
+                String sql2 = "INSERT INTO client_info (client_id, type, total,title) VALUES (?, ?, ?, ?)";
+                PreparedStatement prepare2 = connect.prepareStatement(sql2);
+                prepare2.setInt(1, id);
+                prepare2.setString(2, type);
+                prepare2.setFloat(3, totalWithDiscount);
+
+                prepare2.setString(4, dispo_titre.getText());
+                prepare2.executeUpdate();
+
+                clearbuyticketinfo(); // Effacer les informations d'achat
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void clearbuyticketinfo(){
@@ -695,32 +821,34 @@ public class ActiviterController implements Initializable {
 
         Alert alert;
         if(Dispo_name.getText().isEmpty()
-        || dispo_nameact.getText().isEmpty()
-        || dispo_date.getText().isEmpty()){
+                || dispo_nameact.getText().isEmpty()
+                || dispo_date.getText().isEmpty()){
             alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error Message");
             alert.setHeaderText(null);
-            alert.setContentText("please select the activity first ");
+            alert.setContentText("Please select the activity first");
             alert.showAndWait();
 
+        } else {
+            // Obtenir le nom de l'activité sélectionnée
+            String nomActivite = dispo_nameact.getText();
 
-        }else {
+            // Définir le texte du titre sur le nom de l'activité
+            dispo_titre.setText(nomActivite);
 
+            // Charger l'image correspondant à l'activité sélectionnée
             String uri = "file:" + getData.path;
-            image = new Image(uri, 177, 150, false, true);
+            Image image = new Image(uri);
 
+            // Définir l'image de l'activité dans votre ImageView
+            dispo_imageview.setImage(image);
 
-            dispo_titre.setText(title);
-
+            // Effacer les autres labels
             Dispo_name.setText("");
             dispo_nameact.setText("");
             dispo_date.setText("");
-
-
         }
-
     }
-
 
 
     public void close() {

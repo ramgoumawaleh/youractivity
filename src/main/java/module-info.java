@@ -7,6 +7,8 @@ module org.culturetripp.tonactiviter {
     requires java.logging;
     requires java.prefs;
     requires java.xml;
+    requires kernel;
+    requires layout;
 
 
     opens org.culturetripp.tonactiviter to javafx.fxml;
