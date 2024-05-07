@@ -117,6 +117,11 @@
                            </AnchorPane>
                         </children>
                      </AnchorPane>
+                     <ImageView fx:id="image1" fitHeight="314.0" fitWidth="758.0" layoutX="2.0" layoutY="376.0" pickOnBounds="true">
+                        <image>
+                           <Image url="@../../../../java/image/sky.jpeg" />
+                        </image>
+                     </ImageView>
                   </children>
                </AnchorPane>
                <AnchorPane fx:id="add_form" layoutX="203.0" layoutY="150.0" prefHeight="603.2" prefWidth="680.8" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -268,7 +273,7 @@
                               </font>
                            </Label>
                            <Button fx:id="dispo_viderbtn" layoutX="282.0" layoutY="314.0" mnemonicParsing="false" onAction="#clearbuyticketinfo" styleClass="vider_btn" stylesheets="@Dashboard.css" text="Vider" />
-                           <Button fx:id="dispo_reçubtn" layoutX="506.0" layoutY="314.0" mnemonicParsing="false" onAction="#generatePDF" styleClass="mod_btn" stylesheets="@Dashboard.css" text="Reçu" />
+                           <Button fx:id="dispo_reçubtn" layoutX="506.0" layoutY="314.0" mnemonicParsing="false" onAction="#PDF" styleClass="mod_btn" stylesheets="@Dashboard.css" text="Reçu" />
                            <Button fx:id="dispo_payébtn" layoutX="587.0" layoutY="314.0" mnemonicParsing="false" onAction="#payer" styleClass="insert_btn" stylesheets="@Dashboard.css" text="Payé" />
                         </children>
                      </AnchorPane>
@@ -278,4 +283,29 @@
          </AnchorPane>
       </center>
    </BorderPane>
+   <ImageView fx:id="image2" fitHeight="314.0" fitWidth="731.0" layoutX="-737.0" layoutY="418.0" pickOnBounds="true">
+      <image>
+         <Image url="@../../../java/image/jetsky.jpeg" />
+      </image>
+   </ImageView>
+   <ImageView fx:id="image3" fitHeight="314.0" fitWidth="731.0" layoutX="-737.0" layoutY="432.0" pickOnBounds="true">
+      <image>
+         <Image url="@../../../java/image/dromadaire.jpg" />
+      </image>
+   </ImageView>
+   <ImageView fx:id="image4" fitHeight="314.0" fitWidth="731.0" layoutX="-737.0" layoutY="441.0" pickOnBounds="true">
+      <image>
+         <Image url="@../../../java/image/sky%20nautique.jpg" />
+      </image>
+   </ImageView>
+   <ImageView fx:id="image5" fitHeight="314.0" fitWidth="731.0" layoutX="-737.0" layoutY="432.0" pickOnBounds="true">
+      <image>
+         <Image url="@../../../java/image/plongée%20sous%20marine.png" />
+      </image>
+   </ImageView>
+   <ImageView fx:id="image6" fitHeight="314.0" fitWidth="731.0" layoutX="-737.0" layoutY="425.0" pickOnBounds="true">
+      <image>
+         <Image url="@../../../../java/image/spinner.jpg" />
+      </image>
+   </ImageView>
 </AnchorPane>

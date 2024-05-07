@@ -4,6 +4,7 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.property.TextAlignment;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -11,6 +12,7 @@ import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -20,7 +22,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import com.itextpdf.layout.Document;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.*;
 import java.util.Optional;
@@ -31,6 +32,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
 import javafx.event.ActionEvent;
+import javafx.util.Duration;
 
 import javax.swing.*;
 import java.io.File;
@@ -63,6 +65,24 @@ public class ActiviterController implements Initializable {
 
     @FXML
     private ImageView add_imageview;
+
+    @FXML
+    private ImageView image1;
+
+    @FXML
+    private ImageView image2;
+
+    @FXML
+    private ImageView image3;
+
+    @FXML
+    private ImageView image4;
+
+    @FXML
+    private ImageView image5;
+
+    @FXML
+    private ImageView image6;
 
     @FXML
     private Button add_import;
@@ -265,6 +285,8 @@ public class ActiviterController implements Initializable {
         return listData;
     }
 
+
+
     public ObservableList<AjoutData> listAjoutActiviter;
     public void showAjoutActiviterList(){
         listAjoutActiviter = ajoutActiviterList();
@@ -334,7 +356,7 @@ public class ActiviterController implements Initializable {
         // Vérifier si le chemin d'accès est null ou vide
         if (uri == null || uri.isEmpty()) {
             // Afficher un message d'erreur et sortir de la méthode
-            Alert alert = new Alert(Alert.AlertType.ERROR);
+            Alert alert = new Alert(AlertType.ERROR);
             alert.setTitle("Erreur");
             alert.setHeaderText(null);
             alert.setContentText("Veuillez remplir tous les champs et importer une image");
@@ -357,14 +379,14 @@ public class ActiviterController implements Initializable {
             result = statement.executeQuery(sql1);
 
             if (result.next()) {
-                alert = new Alert(Alert.AlertType.ERROR);
+                alert = new Alert(AlertType.ERROR);
                 alert.setTitle("Erreur");
                 alert.setHeaderText(null);
                 alert.setContentText(add_name.getText() + " a déjà été ajouté");
                 alert.showAndWait();
             } else {
                 if (add_name.getText().isEmpty() || add_nameact.getText().isEmpty() || add_fname.getText().isEmpty() || add_date.getValue() == null) {
-                    alert = new Alert(Alert.AlertType.ERROR);
+                    alert = new Alert(AlertType.ERROR);
                     alert.setTitle("Erreur");
                     alert.setHeaderText(null);
                     alert.setContentText("Veuillez remplir tous les champs");
@@ -379,7 +401,7 @@ public class ActiviterController implements Initializable {
                     prepare.setString(5, String.valueOf(add_date.getValue()));
                     prepare.execute();
 
-                    alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert = new Alert(AlertType.INFORMATION);
                     alert.setTitle("Succès");
                     alert.setHeaderText(null);
                     alert.setContentText("Ajouté avec succès");
@@ -421,7 +443,7 @@ public class ActiviterController implements Initializable {
                     add_nameact.getText().isEmpty() ||
                     add_imageview.getImage() == null ||
                     add_date.getValue() == null) {
-                alert = new Alert(Alert.AlertType.ERROR);
+                alert = new Alert(AlertType.ERROR);
                 alert.setTitle("error");
                 alert.setHeaderText(null);
                 alert.setContentText("Please select the activity first");
@@ -430,7 +452,7 @@ public class ActiviterController implements Initializable {
             }else {
                 statement.executeUpdate(sql);
 
-                alert = new Alert(Alert.AlertType.INFORMATION);
+                alert = new Alert(AlertType.INFORMATION);
                 alert.setTitle("information message");
                 alert.setHeaderText(null);
                 alert.setContentText("successfully update" + add_name.getText());
@@ -459,7 +481,7 @@ public class ActiviterController implements Initializable {
                     add_imageview.getImage() == null ||
                     add_date.getValue() == null){
 
-                alert = new Alert(Alert.AlertType.ERROR);
+                alert = new Alert(AlertType.ERROR);
                 alert.setTitle("Erreur");
                 alert.setHeaderText(null);
                 alert.setContentText("please select the activity first a delete");
@@ -467,7 +489,7 @@ public class ActiviterController implements Initializable {
 
 
             }else {
-                alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert = new Alert(AlertType.CONFIRMATION);
                 alert.setTitle("Confirmation Message");
                 alert.setHeaderText(null);
                 alert.setContentText("are you sure do you want delete "+add_name.getText() + "?");
@@ -482,7 +504,7 @@ public class ActiviterController implements Initializable {
                     showAjoutActiviterList();
                     clearAjoutActiviterList();
 
-                    alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert = new Alert(AlertType.INFORMATION);
                     alert.setTitle("information message");
                     alert.setHeaderText(null);
                     alert.setContentText("successfully delete" );
@@ -551,43 +573,61 @@ public class ActiviterController implements Initializable {
     private int qty1 = 0;
     private int qty2 = 0;
 
-
-
-    public void generatePDF() {
+    public void PDF() {
         ObservableList<Transaction> transactionList = FXCollections.observableArrayList();
-        String sql = "SELECT * FROM client_info WHERE client_id = ?";
+        String sql = "SELECT type, total, date FROM client WHERE client_id = ?";
         LocalDate date = LocalDate.now();
 
+        // Avant l'exécution de la requête SQL
         try (Connection connect = database.connectDb();
              PreparedStatement prepare = connect.prepareStatement(sql)) {
             int customerID = 1;
             prepare.setInt(1, customerID);
+
+            // Après avoir exécuté la requête SQL
             try (ResultSet resultSet = prepare.executeQuery()) {
+                float totalAmount = 0;
                 while (resultSet.next()) {
-                    String productName = resultSet.getString("type");
-                    int quantity = resultSet.getInt("quantity");
-                    float price = resultSet.getFloat("price");
-                    Transaction transaction = new Transaction(productName, quantity, price);
-                    transactionList.add(transaction);
+                    String type = resultSet.getString("type");
+                    float total = resultSet.getFloat("total");
+                    totalAmount += total;
+                    // Ajoutez ici d'autres informations à récupérer si nécessaire
+                }
+                // Ajoutez le montant total récupéré à votre liste de transactions
+                Transaction totalTransaction = new Transaction("Total", 1, totalAmount);
+                transactionList.add(totalTransaction);
+
+                // Après avoir récupéré les données de la base de données
+                try (PdfWriter writer = new PdfWriter("receipt.pdf");
+                     PdfDocument pdf = new PdfDocument(writer);
+                     Document document = new Document(pdf)) {
+                    addHeader(document);
+                    addCustomerInfo(document, date, customerID);
+                    addTransactionDetails(document, transactionList);
+                    addTotalAmount(document, totalAmount); // Ajoutez le montant total ici
+                    addThankYouMessage(document);
+                    System.out.println("PDF file generated successfully.");
                 }
             }
-
-            try (PdfWriter writer = new PdfWriter("receipt.pdf");
-                 PdfDocument pdf = new PdfDocument(writer);
-                 Document document = new Document(pdf)) {
-                addHeader(document);
-                addCustomerInfo(document, date, customerID);
-                addTransactionDetails(document, transactionList);
-                addTotalAmount(document, transactionList);
-                addThankYouMessage(document);
-            }
         } catch (SQLException | IOException e) {
-            throw new RuntimeException("Error while generating PDF", e);
+            e.printStackTrace();
         }
-
-
-
     }
+
+    private float totalAmount;
+    {
+// Code pour ajouter le montant total à votre liste de transactions
+        this.totalAmount = totalAmount; // Affectation du montant total à la variable de classe
+    }
+
+    private void addTotalAmount(Document document, float totalAmount) {
+        Paragraph totalAmountParagraph = new Paragraph("Total Amount Paid: TND " + String.format("%.2f", totalAmount))
+                .setFontSize(12);
+        document.add(totalAmountParagraph);
+    }
+
+
+
 
     private void addHeader(Document document) {
         Paragraph header = new Paragraph("Receipt")
@@ -670,7 +710,7 @@ public class ActiviterController implements Initializable {
 
             // Vérifier si l'image et le titre sont sélectionnés
             if (dispo_imageview.getImage() == null || dispo_titre.getText().isEmpty()) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
+                Alert alert = new Alert(AlertType.ERROR);
                 alert.setTitle("Error Message");
                 alert.setHeaderText(null);
                 alert.setContentText("Please select the activity and enter the title.");
@@ -680,7 +720,7 @@ public class ActiviterController implements Initializable {
                 prepare.executeUpdate();
 
                 // Afficher un message d'alerte pour indiquer le succès de l'achat
-                Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                Alert successAlert = new Alert(AlertType.INFORMATION);
                 successAlert.setTitle("Information Message");
                 successAlert.setHeaderText(null);
                 successAlert.setContentText("Successfully purchased!");
@@ -823,7 +863,7 @@ public class ActiviterController implements Initializable {
         if(Dispo_name.getText().isEmpty()
                 || dispo_nameact.getText().isEmpty()
                 || dispo_date.getText().isEmpty()){
-            alert = new Alert(Alert.AlertType.ERROR);
+            alert = new Alert(AlertType.ERROR);
             alert.setTitle("Error Message");
             alert.setHeaderText(null);
             alert.setContentText("Please select the activity first");
