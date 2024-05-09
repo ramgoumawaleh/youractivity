@@ -26,7 +26,7 @@
                         <graphic>
                            <ImageView fitHeight="13.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
                               <image>
-                                 <Image url="@../../../../resources/image/réduire.png" />
+                                 <Image url="image/réduire.png" />
                               </image>
                            </ImageView>
                         </graphic>
@@ -34,7 +34,7 @@
                      <Label layoutX="151.0" layoutY="12.0" stylesheets="@Dashboard.css" text="CultureTripp_Activiter" />
                      <ImageView fitHeight="15.0" fitWidth="16.0" layoutX="838.0" layoutY="5.0" pickOnBounds="true" preserveRatio="true">
                         <image>
-                           <Image url="@../../../../resources/image/fermer.png" />
+                           <Image url="@image/fermer.png" />
                         </image>
                      </ImageView>
                   </children>
@@ -47,14 +47,15 @@
             <children>
                <ImageView fitHeight="172.0" fitWidth="130.0" layoutX="27.0" layoutY="70.0" pickOnBounds="true" preserveRatio="true">
                   <image>
-                     <Image url="@../../../../resources/image/logo.png" />
+                     <Image url="image/logo.png" />
+
                   </image>
                </ImageView>
                <Button fx:id="dashboard_btn" layoutX="26.0" layoutY="204.0" mnemonicParsing="false" onAction="#switchForm" prefHeight="26.0" prefWidth="98.0" styleClass="nav_btn" stylesheets="@Dashboard.css" text="Home">
                   <graphic>
                      <ImageView fitHeight="20.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                         <image>
-                           <Image url="@../../../../resources/image/home.png" />
+                           <Image url="@image/home.png" />
                         </image>
                      </ImageView>
                   </graphic>
@@ -63,7 +64,7 @@
                   <graphic>
                      <ImageView fitHeight="17.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
                         <image>
-                           <Image url="@../../../../resources/image/ajout.png" />
+                           <Image url="@image/ajout.png" />
                         </image>
                      </ImageView>
                   </graphic>
@@ -72,7 +73,7 @@
                   <graphic>
                      <ImageView fitHeight="17.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                         <image>
-                           <Image url="@../../../../resources/image/dispo.jpeg" />
+                           <Image url="@image/dispo.jpeg" />
                         </image>
                      </ImageView>
                   </graphic>
@@ -81,7 +82,7 @@
                   <graphic>
                      <ImageView fitHeight="20.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true">
                         <image>
-                           <Image url="@../../../../resources/image/client.png" />
+                           <Image url="@image/client.png" />
                         </image>
                      </ImageView>
                   </graphic>
@@ -106,7 +107,7 @@
                                     <children>
                                        <ImageView fitHeight="56.0" fitWidth="44.0" layoutX="14.0" layoutY="66.0" pickOnBounds="true" preserveRatio="true">
                                           <image>
-                                             <Image url="@../../../../resources/image/ticket.png" />
+                                             <Image url="@image/ticket.png" />
                                           </image>
                                        </ImageView>
                                     </children>
@@ -121,7 +122,7 @@
                                     <children>
                                        <ImageView fitHeight="56.0" fitWidth="44.0" layoutX="11.0" layoutY="65.0" pickOnBounds="true" preserveRatio="true">
                                           <image>
-                                             <Image url="@../../../../resources/image/recu.png" />
+                                             <Image url="@image/recu.png" />
                                           </image>
                                        </ImageView>
                                     </children>
@@ -136,7 +137,7 @@
                                     <children>
                                        <ImageView fitHeight="56.0" fitWidth="44.0" layoutX="12.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
                                           <image>
-                                             <Image url="@../../../../resources/image/dispo.jpeg" />
+                                             <Image url="@image/dispo.jpeg" />
                                           </image>
                                        </ImageView>
                                     </children>
@@ -192,7 +193,7 @@
                            <TextField fx:id="addact_cherc" layoutX="97.0" layoutY="34.0" promptText="chercher" styleClass="chercher" stylesheets="@Dashboard.css" />
                            <ImageView fitHeight="15.0" fitWidth="16.0" layoutX="64.0" layoutY="39.0" pickOnBounds="true" preserveRatio="true">
                               <image>
-                                 <Image url="@../../../../resources/image/rechercher.png" />
+                                 <Image url="@image/rechercher.png" />
                               </image>
                            </ImageView>
                         </children>
@@ -347,7 +348,7 @@
                            <TextField fx:id="client_cherch" layoutX="40.0" layoutY="20.0" promptText="chercher" styleClass="chercher" stylesheets="@Dashboard.css" />
                            <ImageView fitHeight="19.0" fitWidth="22.0" layoutX="9.0" layoutY="21.0" pickOnBounds="true" preserveRatio="true">
                               <image>
-                                 <Image url="@../../../../resources/image/rechercher.png" />
+                                 <Image url="@image/rechercher.png" />
                               </image>
                            </ImageView>
                         </children>

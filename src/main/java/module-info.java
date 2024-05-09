@@ -9,6 +9,7 @@ module org.culturetripp.tonactiviter {
     requires java.xml;
     requires kernel;
     requires layout;
+    requires stripe.java;
 
 
     opens org.culturetripp.tonactiviter to javafx.fxml;

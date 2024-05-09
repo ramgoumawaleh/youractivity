@@ -4,15 +4,12 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.property.TextAlignment;
-import javafx.animation.TranslateTransition;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
@@ -32,18 +29,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
 import javafx.event.ActionEvent;
-import javafx.util.Duration;
 
-import javax.swing.*;
 import java.io.File;
 import java.net.URL;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.Date;
-import java.util.ResourceBundle;
-import java.util.Optional;
 
-import static org.culturetripp.tonactiviter.getData.date;
 import static org.culturetripp.tonactiviter.getData.title;
 
 public class ActiviterController implements Initializable {
@@ -573,16 +565,15 @@ public class ActiviterController implements Initializable {
     private int qty1 = 0;
     private int qty2 = 0;
 
+
     public void PDF() {
         ObservableList<Transaction> transactionList = FXCollections.observableArrayList();
-        String sql = "SELECT type, total, date FROM client WHERE client_id = ?";
+        String sql = "SELECT type, total FROM client WHERE id = (SELECT MAX(id) FROM client)";
         LocalDate date = LocalDate.now();
 
         // Avant l'exécution de la requête SQL
         try (Connection connect = database.connectDb();
              PreparedStatement prepare = connect.prepareStatement(sql)) {
-            int customerID = 1;
-            prepare.setInt(1, customerID);
 
             // Après avoir exécuté la requête SQL
             try (ResultSet resultSet = prepare.executeQuery()) {
@@ -602,7 +593,7 @@ public class ActiviterController implements Initializable {
                      PdfDocument pdf = new PdfDocument(writer);
                      Document document = new Document(pdf)) {
                     addHeader(document);
-                    addCustomerInfo(document, date, customerID);
+                    addCustomerInfo(document,date);
                     addTransactionDetails(document, transactionList);
                     addTotalAmount(document, totalAmount); // Ajoutez le montant total ici
                     addThankYouMessage(document);
@@ -614,20 +605,12 @@ public class ActiviterController implements Initializable {
         }
     }
 
-    private float totalAmount;
-    {
-// Code pour ajouter le montant total à votre liste de transactions
-        this.totalAmount = totalAmount; // Affectation du montant total à la variable de classe
-    }
 
     private void addTotalAmount(Document document, float totalAmount) {
         Paragraph totalAmountParagraph = new Paragraph("Total Amount Paid: TND " + String.format("%.2f", totalAmount))
                 .setFontSize(12);
         document.add(totalAmountParagraph);
     }
-
-
-
 
     private void addHeader(Document document) {
         Paragraph header = new Paragraph("Receipt")
@@ -636,7 +619,8 @@ public class ActiviterController implements Initializable {
         document.add(header);
     }
 
-    private void addCustomerInfo(Document document, LocalDate date, int customerID) {
+    private void addCustomerInfo(Document document, LocalDate date) {
+        String customerID = "";
         Paragraph customerInfo = new Paragraph("Date: " + date.toString() + "\nCustomer ID: " + customerID)
                 .setFontSize(12);
         document.add(customerInfo);
@@ -652,13 +636,6 @@ public class ActiviterController implements Initializable {
         }
     }
 
-    private void addTotalAmount(Document document, ObservableList<Transaction> transactionList) {
-        float totalAmount = calculateTotalAmount(transactionList);
-        Paragraph totalAmountParagraph = new Paragraph("Total Amount: TND " + String.format("%.2f", totalAmount))
-                .setFontSize(12);
-        document.add(totalAmountParagraph);
-    }
-
     private void addThankYouMessage(Document document) {
         Paragraph thankYouParagraph = new Paragraph("Thank you for your purchase!")
                 .setFontSize(12);
@@ -672,7 +649,6 @@ public class ActiviterController implements Initializable {
         }
         return totalAmount;
     }
-
 
 
 
