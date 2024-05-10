@@ -4,6 +4,9 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.property.TextAlignment;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentCreateParams;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -23,6 +26,9 @@ import java.io.IOException;
 import java.sql.*;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.ArrayList;
+import java.util.List;
+
 
 
 import javafx.scene.control.Alert;
@@ -342,25 +348,26 @@ public class ActiviterController implements Initializable {
 
 
     public void insertAjoutActiviter() {
-
         String uri = getData.path;
 
         // Vérifier si le chemin d'accès est null ou vide
         if (uri == null || uri.isEmpty()) {
             // Afficher un message d'erreur et sortir de la méthode
-            Alert alert = new Alert(AlertType.ERROR);
-            alert.setTitle("Erreur");
-            alert.setHeaderText(null);
-            alert.setContentText("Veuillez remplir tous les champs et importer une image");
-            alert.showAndWait();
+            showAlert(AlertType.ERROR, "Erreur", null, "Veuillez remplir tous les champs et importer une image");
             return;
         }
 
         // Remplacer les caractères "\\" dans le chemin d'accès
         uri = uri.replace("\\", "\\\\");
 
+        String nomActivite = add_nameact.getText();
+        if (containsBadWord(nomActivite)) {
+            showAlert(AlertType.ERROR, "Erreur", null, "Le nom de l'activité contient des mots inappropriés.");
+            return;
+        }
+
         String sql1 = "SELECT * FROM ajoutactiviter WHERE nom= '"
-                +add_name.getText()+"'";
+                + add_name.getText() + "'";
 
         connect = database.connectDb();
 
@@ -371,33 +378,21 @@ public class ActiviterController implements Initializable {
             result = statement.executeQuery(sql1);
 
             if (result.next()) {
-                alert = new Alert(AlertType.ERROR);
-                alert.setTitle("Erreur");
-                alert.setHeaderText(null);
-                alert.setContentText(add_name.getText() + " a déjà été ajouté");
-                alert.showAndWait();
+                showAlert(AlertType.ERROR, "Erreur", null, add_name.getText() + " a déjà été ajouté");
             } else {
                 if (add_name.getText().isEmpty() || add_nameact.getText().isEmpty() || add_fname.getText().isEmpty() || add_date.getValue() == null) {
-                    alert = new Alert(AlertType.ERROR);
-                    alert.setTitle("Erreur");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Veuillez remplir tous les champs");
-                    alert.showAndWait();
+                    showAlert(AlertType.ERROR, "Erreur", null, "Veuillez remplir tous les champs");
                 } else {
                     String sql = "INSERT INTO ajoutactiviter (nom, prenom, NomActiviter, image, date) VALUES (?, ?, ?, ?, ?)";
                     prepare = connect.prepareStatement(sql);
                     prepare.setString(1, add_name.getText());
                     prepare.setString(2, add_fname.getText());
-                    prepare.setString(3, add_nameact.getText());
+                    prepare.setString(3, nomActivite);
                     prepare.setString(4, uri);
                     prepare.setString(5, String.valueOf(add_date.getValue()));
                     prepare.execute();
 
-                    alert = new Alert(AlertType.INFORMATION);
-                    alert.setTitle("Succès");
-                    alert.setHeaderText(null);
-                    alert.setContentText("Ajouté avec succès");
-                    alert.showAndWait();
+                    showAlert(AlertType.INFORMATION, "Succès", null, "Ajouté avec succès");
 
                     clearAjoutActiviterList();
                     showAjoutActiviterList();
@@ -408,6 +403,30 @@ public class ActiviterController implements Initializable {
         }
     }
 
+    // Fonction pour vérifier si le texte contient des mots interdits
+    private boolean containsBadWord(String text) {
+        List<String> badWords = new ArrayList<>();
+        // Ajoutez ici vos mots interdits à la liste badWords
+        badWords.add("fuck");
+        badWords.add("zebi");
+        // Ajoutez autant de mots que nécessaire
+
+        for (String word : badWords) {
+            if (text.toLowerCase().contains(word.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Fonction pour afficher une boîte de dialogue
+    private void showAlert(AlertType type, String title, String headerText, String contentText) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(headerText);
+        alert.setContentText(contentText);
+        alert.showAndWait();
+    }
 
 
 
@@ -566,6 +585,8 @@ public class ActiviterController implements Initializable {
     private int qty2 = 0;
 
 
+
+
     public void PDF() {
         ObservableList<Transaction> transactionList = FXCollections.observableArrayList();
         String sql = "SELECT type, total FROM client WHERE id = (SELECT MAX(id) FROM client)";
@@ -650,11 +671,73 @@ public class ActiviterController implements Initializable {
         return totalAmount;
     }
 
+    static double getTotalAmountFromDatabase() {
+        double totalAmount = 0.0;
+        Connection connection = null;
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+
+        try {
+            // Établissez une connexion à la base de données
+            connection = database.connectDb();
+
+            // Exécutez la requête SQL pour obtenir le montant total
+            String query = "SELECT SUM(total) AS total FROM client WHERE id = ?";
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, customerID()); // Passez l'ID du client à la requête SQL
+            resultSet = preparedStatement.executeQuery();
+
+            // Récupérez le montant total à partir du résultat de la requête
+            if (resultSet.next()) {
+                totalAmount = resultSet.getDouble("total");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            // Fermez les ressources de base de données
+            try {
+                if (resultSet != null) resultSet.close();
+                if (preparedStatement != null) preparedStatement.close();
+                if (connection != null) connection.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return totalAmount;
+    }
+
+    static void processPayment(double totalAmount) {
+        try {
+            // Convertissez le montant total en cents
+            long amount = (long) (totalAmount * 100);
+
+            // Créez un PaymentIntent avec les détails du paiement
+            PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
+                    .setAmount(amount)
+                    .setCurrency("usd")
+                    .build();
+
+            PaymentIntent intent = PaymentIntent.create(params);
+
+            // Si le paiement a réussi, affichez un message de succès
+            System.out.println("Paiement réussi. ID du PaymentIntent : " + intent.getId());
+        } catch (StripeException e) {
+            // Si une erreur s'est produite lors du traitement du paiement, affichez le message d'erreur
+            System.out.println("Échec du paiement. Erreur : " + e.getMessage());
+        }
+    }
+
+    private static int customerID() {
+        // Implémentez la logique pour obtenir l'ID du client
+        return 123; // Remplacez ceci par la logique réelle pour récupérer l'ID du client
+    }
 
 
 
 
     public void payer() {
+
         String sql = "INSERT INTO client (type, total, date) VALUES (?, ?, ?)";
         connect = database.connectDb();
         String type = "";
@@ -726,7 +809,10 @@ public class ActiviterController implements Initializable {
         }
     }
 
-    public void clearbuyticketinfo(){
+
+
+
+public void clearbuyticketinfo(){
         spinner1 = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,100,0);
         spinner2 = new SpinnerValueFactory.IntegerSpinnerValueFactory(0,100,0);
 

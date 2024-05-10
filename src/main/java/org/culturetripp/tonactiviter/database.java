@@ -20,4 +20,8 @@ public class database {
     public static Connection connectDb() {
         return connect();
     }
+
+    public static Connection connectDB() {
+        return null;
+    }
 }

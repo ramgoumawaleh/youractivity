@@ -10,6 +10,7 @@ module org.culturetripp.tonactiviter {
     requires kernel;
     requires layout;
     requires stripe.java;
+    requires mysql.connector.j;
 
 
     opens org.culturetripp.tonactiviter to javafx.fxml;
